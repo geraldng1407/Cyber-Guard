@@ -1,0 +1,9 @@
+ /env/*
+/_pycache_
+mysql-denmark-logs/
+mysql-sg-logs/
+/.venv
+/__pycache__
+node_modules/
+anomaly_detection/__pycache__/utils.cpython-311.pyc
+config.json

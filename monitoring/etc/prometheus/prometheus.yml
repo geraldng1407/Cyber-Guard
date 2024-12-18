@@ -1,0 +1,287 @@
+global:
+  scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: 'app-sg'
+    scrape_interval: 5s
+
+    static_configs:
+      - targets: 
+        - 'payment-processing-singapore-1:8000'
+        - 'market-data-singapore-1:8000'
+        - 'risk-calc-singapore-1:8000'
+        - 'portfolio-dashboard-singapore-1:8000'
+        - 'market-monitoring-singapore-1:8000'
+        - 'crm-portal-singapore-1:8000'
+        - 'retail-banking-singapore-1:8000'
+        - 'treasury-management-singapore-1:8000'
+        - 'trade-execution-singapore-1:8000'
+        - 'identity-access-singapore-1:8000'
+        - 'mfa-singapore-singapore-1:8000'
+        - 'sso-gateway-singapore-1:8000'
+        - 'customer-info-singapore-1:8000'
+        - 'trade-repository-singapore-1:8000'
+        - 'risk-data-singapore-1:8000'
+        - 'workflow-manager-singapore-1:8000'
+        - 'task-scheduler-singapore-1:8000'
+        - 'compliance-monitor-singapore-1:8000'
+        labels:
+        #   container_name: application-sg
+          country: Singapore
+          code: SGP
+
+  - job_name: 'app-canada'
+
+    # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 5s
+
+    static_configs:
+      - targets: 
+        - 'payment-processing-canada-1:8000'
+        - 'market-data-canada-1:8000'
+        - 'risk-calc-canada-1:8000'
+        - 'portfolio-dashboard-canada-1:8000'
+        - 'market-monitoring-canada-1:8000'
+        - 'crm-portal-canada-1:8000'
+        - 'retail-banking-canada-1:8000'
+        - 'treasury-management-canada-1:8000'
+        - 'trade-execution-canada-1:8000'
+        - 'identity-access-canada-1:8000'
+        - 'mfa-singapore-canada-1:8000'
+        - 'sso-gateway-canada-1:8000'
+        - 'customer-info-canada-1:8000'
+        - 'trade-repository-canada-1:8000'
+        - 'risk-data-canada-1:8000'
+        - 'workflow-manager-canada-1:8000'
+        - 'task-scheduler-canada-1:8000'
+        - 'compliance-monitor-canada-1:8000'
+        labels:
+        #   container_name: app-canada
+          code: CAN
+          country: Canada
+          app_name: Applications
+
+
+  - job_name: 'app-germany'
+
+    # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 5s
+
+    static_configs:
+      - targets:
+        - 'payment-processing-germany-1:8000'
+        - 'market-data-germany-1:8000'
+        - 'risk-calc-germany-1:8000'
+        - 'portfolio-dashboard-germany-1:8000'
+        - 'market-monitoring-germany-1:8000'
+        - 'crm-portal-germany-1:8000'
+        - 'retail-banking-germany-1:8000'
+        - 'treasury-management-germany-1:8000'
+        - 'trade-execution-germany-1:8000'
+        - 'identity-access-germany-1:8000'
+        - 'mfa-singapore-germany-1:8000'
+        - 'sso-gateway-germany-1:8000'
+        - 'customer-info-germany-1:8000'
+        - 'trade-repository-germany-1:8000'
+        - 'risk-data-germany-1:8000'
+        - 'workflow-manager-germany-1:8000'
+        - 'task-scheduler-germany-1:8000'
+        - 'compliance-monitor-germany-1:8000'
+        labels:
+        #   # latitude: "5.4141"
+        #   # longitude: "100.3285"
+        #   container_name: app-germany
+          country: Germany
+          code: DEU
+        #   app_name: Frontend Application
+          
+
+  - job_name: 'app-china'
+
+    # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 5s
+
+    static_configs:
+      - targets:
+        - 'payment-processing-china-1:8000'
+        - 'market-data-china-1:8000'
+        - 'risk-calc-china-1:8000'
+        - 'portfolio-dashboard-china-1:8000'
+        - 'market-monitoring-china-1:8000'
+        - 'crm-portal-china-1:8000'
+        - 'retail-banking-china-1:8000'
+        - 'treasury-management-china-1:8000'
+        - 'trade-execution-china-1:8000'
+        - 'identity-access-china-1:8000'
+        - 'mfa-singapore-china-1:8000'
+        - 'sso-gateway-china-1:8000'
+        - 'customer-info-china-1:8000'
+        - 'trade-repository-china-1:8000'
+        - 'risk-data-china-1:8000'
+        - 'workflow-manager-china-1:8000'
+        - 'task-scheduler-china-1:8000'
+        - 'compliance-monitor-china-1:8000'
+        labels:
+        #   # latitude: "51.1657"
+        #   # longitude: "10.4515"
+        #   container_name: app-china
+          country: China
+          code: CHM
+        #   app_name: Web Application
+
+  - job_name: 'app-japan'
+
+    # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 5s
+
+    static_configs:
+      - targets:
+        - 'payment-processing-japan-1:8000'
+        - 'market-data-japan-1:8000'
+        - 'risk-calc-japan-1:8000'
+        - 'portfolio-dashboard-japan-1:8000'
+        - 'market-monitoring-japan-1:8000'
+        - 'crm-portal-japan-1:8000'
+        - 'retail-banking-japan-1:8000'
+        - 'treasury-management-japan-1:8000'
+        - 'trade-execution-japan-1:8000'
+        - 'identity-access-japan-1:8000'
+        - 'mfa-singapore-japan-1:8000'
+        - 'sso-gateway-japan-1:8000'
+        - 'customer-info-japan-1:8000'
+        - 'trade-repository-japan-1:8000'
+        - 'risk-data-japan-1:8000'
+        - 'workflow-manager-japan-1:8000'
+        - 'task-scheduler-japan-1:8000'
+        - 'compliance-monitor-japan-1:8000'
+        labels:
+          # latitude: "52.3676"
+          # longitude: "4.9041"
+          # container_name: app-japan
+          country: Japan
+          code: JPN
+          # app_name: Application
+
+  - job_name: 'app-unitedstates'
+
+    # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 5s
+
+    static_configs:
+      - targets: 
+        - 'payment-processing-united-states-1:8000'
+        - 'market-data-united-states-1:8000'
+        - 'risk-calc-united-states-1:8000'
+        - 'portfolio-dashboard-united-states-1:8000'
+        - 'market-monitoring-united-states-1:8000'
+        - 'crm-portal-united-states-1:8000'
+        - 'retail-banking-united-states-1:8000'
+        - 'treasury-management-united-states-1:8000'
+        - 'trade-execution-united-states-1:8000'
+        - 'identity-access-united-states-1:8000'
+        - 'mfa-singapore-united-states-1:8000'
+        - 'sso-gateway-united-states-1:8000'
+        - 'customer-info-united-states-1:8000'
+        - 'trade-repository-united-states-1:8000'
+        - 'risk-data-united-states-1:8000'
+        - 'workflow-manager-united-states-1:8000'
+        - 'task-scheduler-united-states-1:8000'
+        - 'compliance-monitor-united-states-1:8000'
+        labels:
+        #   latitude: "56.2639"
+        #   longitude: "9.5018"
+        #   container_name: app-unitedstates
+          country: "United States"
+          code: USA
+        #   app_name: Application
+
+  - job_name: 'login-app'
+
+    # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 5s
+
+    static_configs:
+      - targets: ['login-app:8000']
+        labels:
+          # latitude: "1.3521"
+          # longitude: "103.8198"
+          container_name: login-app
+          app_name: Login Application
+
+
+  # - job_name: 'database-app-sg'
+
+  #   # Override the global default and scrape targets from this job every 5 seconds.
+  #   scrape_interval: 5s
+
+  #   static_configs:
+  #     - targets: 
+  #       - 'database-app-sg-1:8000'
+  #       - 'database-app-sg-2:8000'
+  #       labels:
+  #         # latitude: "1.3521"
+  #         # longitude: "103.8198"
+  #         container_name: database-app-sg
+  #         country: Singapore
+  #         code: SGP
+  #         app_name: Backend Application
+
+  # - job_name: 'database-app-unitedstates'
+
+  #   # Override the global default and scrape targets from this job every 5 seconds.
+  #   scrape_interval: 5s
+
+  #   static_configs:
+  #     - targets: ['database-app-unitedstates:8000']
+  #       labels:
+  #         # latitude: "56.2639"
+  #         # longitude: "9.5018"
+  #         container_name: database-app-unitedstates
+  #         country: "United States"
+  #         code: USA
+  #         app_name: Backend Application
+
+  # - job_name: 'mysqld_exporter_sg'
+  #   static_configs:
+  #     - targets: ['mysqld_exporter_sg:9104']
+  #       labels:
+  #         container_name: mysql-sg
+  #         country: Singapore
+  #         code: SGP
+
+  # - job_name: 'mysqld_exporter_unitedstates'
+  #   static_configs:
+  #     - targets: ['mysqld_exporter_unitedstates:9104']
+  #       labels:
+  #         container_name: mysql-unitedstates
+  #         # latitude: "56.2639"
+  #         # longitude: "9.5018"
+  #         country: "United States"
+  #         code: USA
+  
+  - job_name: 'docker'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  

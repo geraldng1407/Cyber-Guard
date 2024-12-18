@@ -1,0 +1,46 @@
+# server:
+#   http_listen_port: 9080
+#   grpc_listen_port: 0
+
+# positions:
+#   filename: /tmp/positions.yaml
+
+# clients:
+#   - url: http://loki:3100/loki/api/v1/push
+
+# scrape_configs:
+#   - job_name: mysql-logs-sg
+#     static_configs:
+#       - targets:
+#           - localhost
+#         labels:
+#           job: mysql-sg
+#           __path__: /var/log/mysql-sg/*.log  # Path to MySQL logs for mysql-sg
+#           country: Singapore
+#           code: SGP
+#           container_name: mysql-sg
+#           compose_service: mysql-sg
+#     pipeline_stages:
+#           - multiline:
+#               firstline: '^[0-9]{4}-[0-9]{2}-[0-9]{2}.*$'
+#               pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}.*$'  # Matches the start of each log entry
+#               negate: true  # Append lines that do not match
+#               action: preserve
+
+#   - job_name: mysql-logs-unitedstates
+#     static_configs:
+#       - targets:
+#           - localhost
+#         labels:
+#           job: mysql-unitedstates
+#           __path__: /var/log/mysql-unitedstates/*.log  # Path to MySQL logs for mysql-denmark
+#           country: "United States"
+#           code: USA
+#           container_name: mysql-unitedstates
+#           compose_service: mysql-unitedstates
+#     pipeline_stages:
+#           - multiline:
+#               firstline: '^[0-9]{4}-[0-9]{2}-[0-9]{2}.*$'
+#               pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}.*$'  # Matches the start of each log entry
+#               negate: true  # Append lines that do not match
+#               action: preserve

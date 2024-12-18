@@ -1,0 +1,2429 @@
+x-logging: &default-logging
+  driver: loki
+  options:
+    loki-url: 'http://localhost:3100/api/prom/push'
+    loki-pipeline-stages: |
+      - multiline:
+          firstline: '^\d{4}-\d{2}-\d{2} \d{1,2}:\d{2}:\d{2}'
+          max_wait_time: 3s
+      - regex:
+          expression: '^(?P<time>\d{4}-\d{2}-\d{2} \d{1,2}:\d{2}:\d{2},\d{3}) - \[Country: (?P<country>[\w\s]+), Code: (?P<code>\w+)\] - (?P<message>.*)'
+      - labels:
+          country: "country"
+          code: "code"
+          instance: "${instance}"
+
+version: "3.4"
+
+services:
+  loki:
+    image: grafana/loki:3.0.0
+    command: -config.file=/etc/loki/local-config.yaml
+    ports:
+      - "3100:3100"
+    networks:
+      - my-network
+
+  payment-processing-singapore-1:
+    # build: ./fastapi_app/
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8001:8000"
+    depends_on:
+      - loki  
+    environment:
+      APP_NAME: "Payment Processing System"
+      COUNTRY: "Singapore"
+      CODE: "SGP"
+      CONTAINER_NAME: "payment-processing-singapore-1"
+      instance: "payment-processing-singapore-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "Singapore"
+      CODE: "SGP"
+    logging: *default-logging
+    networks:
+      - my-network
+  
+  market-data-singapore-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8002:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Market Data Aggregator"
+      COUNTRY: "Singapore"
+      CODE: "SGP"
+      CONTAINER_NAME: "market-data-singapore-1"
+      instance: "market-data-singapore-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "Singapore"
+      CODE: "SGP"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  # risk-calc-singapore-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "8003:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Risk Calculation Engine"
+  #     COUNTRY: "Singapore"
+  #     CODE: "SGP"
+  #     CONTAINER_NAME: "risk-calc-singapore-1"
+  #     instance: "risk-calc-singapore-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Singapore"
+  #     CODE: "SGP"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # portfolio-dashboard-singapore-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "8004:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Portfolio Management Dashboard"
+  #     COUNTRY: "Singapore"
+  #     CODE: "SGP"
+  #     CONTAINER_NAME: "portfolio-dashboard-singapore-1"
+  #     instance: "portfolio-dashboard-singapore-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Singapore"
+  #     CODE: "SGP"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # market-monitoring-singapore-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "8005:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Market Monitoring Interface"
+  #     COUNTRY: "Singapore"
+  #     CODE: "SGP"
+  #     CONTAINER_NAME: "market-monitoring-singapore-1"
+  #     instance: "market-monitoring-singapore-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Singapore"
+  #     CODE: "SGP"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  crm-portal-singapore-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8006:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "CRM Portal"
+      COUNTRY: "Singapore"
+      CODE: "SGP"
+      CONTAINER_NAME: "crm-portal-singapore-1"
+      instance: "crm-portal-singapore-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "Singapore"
+      CODE: "SGP"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  # retail-banking-singapore-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "8007:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Retail Banking Portal"
+  #     COUNTRY: "Singapore"
+  #     CODE: "SGP"
+  #     CONTAINER_NAME: "retail-banking-singapore-1"
+  #     instance: "retail-banking-singapore-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Singapore"
+  #     CODE: "SGP"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  treasury-management-singapore-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8008:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Treasury Management System"
+      COUNTRY: "Singapore"
+      CODE: "SGP"
+      CONTAINER_NAME: "treasury-management-singapore-1"
+      instance: "treasury-management-singapore-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "Singapore"
+      CODE: "SGP"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  trade-execution-singapore-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8009:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Trade Execution Platform"
+      COUNTRY: "Singapore"
+      CODE: "SGP"
+      CONTAINER_NAME: "trade-execution-singapore-1"
+      instance: "trade-execution-singapore-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "Singapore"
+      CODE: "SGP"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  # identity-access-singapore-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "8010:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Identity Access Manager"
+  #     COUNTRY: "Singapore"
+  #     CODE: "SGP"
+  #     CONTAINER_NAME: "identity-access-singapore-1"
+  #     instance: "identity-access-singapore-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Singapore"
+  #     CODE: "SGP"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  mfa-singapore-singapore-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8011:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Multi-Factor Authentication (MFA) System"
+      COUNTRY: "Singapore"
+      CODE: "SGP"
+      CONTAINER_NAME: "mfa-singapore-singapore-1"
+      instance: "mfa-singapore-singapore-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "Singapore"
+      CODE: "SGP"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  sso-gateway-singapore-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8012:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Client Single Sign-On (SSO) Gateway"
+      COUNTRY: "Singapore"
+      CODE: "SGP"
+      CONTAINER_NAME: "sso-gateway-singapore-1"
+      instance: "sso-gateway-singapore-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "Singapore"
+      CODE: "SGP"
+    logging: *default-logging
+    networks:
+      - my-network
+  
+  customer-info-singapore-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8013:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Customer Information Database"
+      COUNTRY: "Singapore"
+      CODE: "SGP"
+      CONTAINER_NAME: "customer-info-singapore-1"
+      instance: "customer-info-singapore-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "Singapore"
+      CODE: "SGP"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  trade-repository-singapore-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8014:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Trade Repository"
+      COUNTRY: "Singapore"
+      CODE: "SGP"
+      CONTAINER_NAME: "trade-repository-singapore-1"
+      instance: "trade-repository-singapore-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "Singapore"
+      CODE: "SGP"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  # risk-data-singapore-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "8015:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Risk Data Warehouse"
+  #     COUNTRY: "Singapore"
+  #     CODE: "SGP"
+  #     CONTAINER_NAME: "risk-data-singapore-1"
+  #     instance: "risk-data-singapore-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Singapore"
+  #     CODE: "SGP"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # workflow-manager-singapore-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "8016:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Document Workflow Manager"
+  #     COUNTRY: "Singapore"
+  #     CODE: "SGP"
+  #     CONTAINER_NAME: "workflow-manager-singapore-1"
+  #     instance: "workflow-manager-singapore-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Singapore"
+  #     CODE: "SGP"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  task-scheduler-singapore-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8017:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Task Scheduling System"
+      COUNTRY: "Singapore"
+      CODE: "SGP"
+      CONTAINER_NAME: "task-scheduler-singapore-1"
+      instance: "task-scheduler-singapore-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "Singapore"
+      CODE: "SGP"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  # compliance-monitor-singapore-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "8018:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Compliance Monitoring Tool"
+  #     COUNTRY: "Singapore"
+  #     CODE: "SGP"
+  #     CONTAINER_NAME: "compliance-monitor-singapore-1"
+  #     instance: "compliance-monitor-singapore-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Singapore"
+  #     CODE: "SGP"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  payment-processing-japan-1:
+    # build: ./fastapi_app/
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8019:8000"
+    depends_on:
+      - loki  
+    environment:
+      APP_NAME: "Payment Processing System"
+      COUNTRY: "Japan"
+      CODE: "JPN"
+      CONTAINER_NAME: "payment-processing-japan-1"
+      instance: "payment-processing-japan-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "Japan"
+      CODE: "JPN"
+    logging: *default-logging
+    networks:
+      - my-network
+  
+  market-data-japan-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8020:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Market Data Aggregator"
+      COUNTRY: "Japan"
+      CODE: "JPN"
+      CONTAINER_NAME: "market-data-japan-1"
+      instance: "market-data-japan-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "Japan"
+      CODE: "JPN"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  # risk-calc-japan-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "8059:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Risk Calculation Engine"
+  #     COUNTRY: "Japan"
+  #     CODE: "JPN"
+  #     CONTAINER_NAME: "risk-calc-japan-1"
+  #     instance: "risk-calc-japan-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Japan"
+  #     CODE: "JPN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # portfolio-dashboard-japan-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "8022:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Portfolio Management Dashboard"
+  #     COUNTRY: "Japan"
+  #     CODE: "JPN"
+  #     CONTAINER_NAME: "portfolio-dashboard-japan-1"
+  #     instance: "portfolio-dashboard-japan-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Japan"
+  #     CODE: "JPN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # market-monitoring-japan-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "8023:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Market Monitoring Interface"
+  #     COUNTRY: "Japan"
+  #     CODE: "JPN"
+  #     CONTAINER_NAME: "market-monitoring-japan-1"
+  #     instance: "market-monitoring-japan-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Japan"
+  #     CODE: "JPN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  crm-portal-japan-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8024:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "CRM Portal"
+      COUNTRY: "Japan"
+      CODE: "JPN"
+      CONTAINER_NAME: "crm-portal-japan-1"
+      instance: "crm-portal-japan-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "Japan"
+      CODE: "JPN"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  # retail-banking-japan-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "8025:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Retail Banking Portal"
+  #     COUNTRY: "Japan"
+  #     CODE: "JPN"
+  #     CONTAINER_NAME: "retail-banking-japan-1"
+  #     instance: "retail-banking-japan-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Japan"
+  #     CODE: "JPN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  treasury-management-japan-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8026:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Treasury Management System"
+      COUNTRY: "Japan"
+      CODE: "JPN"
+      CONTAINER_NAME: "treasury-management-japan-1"
+      instance: "treasury-management-japan-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "Japan"
+      CODE: "JPN"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  trade-execution-japan-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8027:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Trade Execution Platform"
+      COUNTRY: "Japan"
+      CODE: "JPN"
+      CONTAINER_NAME: "trade-execution-japan-1"
+      instance: "trade-execution-japan-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "Japan"
+      CODE: "JPN"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  # identity-access-japan-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "8028:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Identity Access Manager"
+  #     COUNTRY: "Japan"
+  #     CODE: "JPN"
+  #     CONTAINER_NAME: "identity-access-japan-1"
+  #     instance: "identity-access-japan-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Japan"
+  #     CODE: "JPN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  mfa-singapore-japan-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8029:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Multi-Factor Authentication (MFA) System"
+      COUNTRY: "Japan"
+      CODE: "JPN"
+      CONTAINER_NAME: "mfa-singapore-japan-1"
+      instance: "mfa-singapore-japan-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "Japan"
+      CODE: "JPN"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  sso-gateway-japan-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8030:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Client Single Sign-On (SSO) Gateway"
+      COUNTRY: "Japan"
+      CODE: "JPN"
+      CONTAINER_NAME: "sso-gateway-japan-1"
+      instance: "sso-gateway-japan-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "Japan"
+      CODE: "JPN"
+    logging: *default-logging
+    networks:
+      - my-network
+  
+  customer-info-japan-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8031:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Customer Information Database"
+      COUNTRY: "Japan"
+      CODE: "JPN"
+      CONTAINER_NAME: "customer-info-japan-1"
+      instance: "customer-info-japan-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "Japan"
+      CODE: "JPN"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  trade-repository-japan-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8032:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Trade Repository"
+      COUNTRY: "Japan"
+      CODE: "JPN"
+      CONTAINER_NAME: "trade-repository-japan-1"
+      instance: "trade-repository-japan-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "Japan"
+      CODE: "JPN"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  # risk-data-japan-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "8033:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Risk Data Warehouse"
+  #     COUNTRY: "Japan"
+  #     CODE: "JPN"
+  #     CONTAINER_NAME: "risk-data-japan-1"
+  #     instance: "risk-data-japan-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Japan"
+  #     CODE: "JPN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # workflow-manager-japan-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "8034:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Document Workflow Manager"
+  #     COUNTRY: "Japan"
+  #     CODE: "JPN"
+  #     CONTAINER_NAME: "workflow-manager-japan-1"
+  #     instance: "workflow-manager-japan-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Japan"
+  #     CODE: "JPN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  task-scheduler-japan-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8035:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Task Scheduling System"
+      COUNTRY: "Japan"
+      CODE: "JPN"
+      CONTAINER_NAME: "task-scheduler-Japan-1"
+      instance: "task-scheduler-japan-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "Japan"
+      CODE: "JPN"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  # compliance-monitor-japan-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "8036:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Compliance Monitoring Tool"
+  #     COUNTRY: "Japan"
+  #     CODE: "JPN"
+  #     CONTAINER_NAME: "compliance-monitor-japan-1"
+  #     instance: "compliance-monitor-japan-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Japan"
+  #     CODE: "JPN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  payment-processing-china-1:
+    # build: ./fastapi_app/
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8037:8000"
+    depends_on:
+      - loki  
+    environment:
+      APP_NAME: "Payment Processing System"
+      COUNTRY: "China"
+      CODE: "CHN"
+      CONTAINER_NAME: "payment-processing-china-1"
+      instance: "payment-processing-china-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "China"
+      CODE: "CHN"
+    logging: *default-logging
+    networks:
+      - my-network
+  
+  market-data-china-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8038:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Market Data Aggregator"
+      COUNTRY: "China"
+      CODE: "CHN"
+      CONTAINER_NAME: "market-data-china-1"
+      instance: "market-data-china-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "China"
+      CODE: "CHN"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  # risk-calc-china-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "8039:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Risk Calculation Engine"
+  #     COUNTRY: "China"
+  #     CODE: "CHN"
+  #     CONTAINER_NAME: "risk-calc-china-1"
+  #     instance: "risk-calc-china-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "China"
+  #     CODE: "CHN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # portfolio-dashboard-china-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "8040:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Portfolio Management Dashboard"
+  #     COUNTRY: "China"
+  #     CODE: "CHN"
+  #     CONTAINER_NAME: "portfolio-dashboard-china-1"
+  #     instance: "portfolio-dashboard-china-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "China"
+  #     CODE: "CHN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # market-monitoring-china-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "8041:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Market Monitoring Interface"
+  #     COUNTRY: "China"
+  #     CODE: "CHN"
+  #     CONTAINER_NAME: "market-monitoring-china-1"
+  #     instance: "market-monitoring-china-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "China"
+  #     CODE: "CHN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  crm-portal-china-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8042:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "CRM Portal"
+      COUNTRY: "China"
+      CODE: "CHN"
+      CONTAINER_NAME: "crm-portal-china-1"
+      instance: "crm-portal-china-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "China"
+      CODE: "CHN"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  # retail-banking-china-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "8043:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Retail Banking Portal"
+  #     COUNTRY: "China"
+  #     CODE: "CHN"
+  #     CONTAINER_NAME: "retail-banking-china-1"
+  #     instance: "retail-banking-china-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "China"
+  #     CODE: "CHN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  treasury-management-china-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8044:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Treasury Management System"
+      COUNTRY: "China"
+      CODE: "CHN"
+      CONTAINER_NAME: "treasury-management-china-1"
+      instance: "treasury-management-china-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "China"
+      CODE: "CHN"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  trade-execution-china-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8045:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Trade Execution Platform"
+      COUNTRY: "China"
+      CODE: "CHN"
+      CONTAINER_NAME: "trade-execution-china-1"
+      instance: "trade-execution-china-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "China"
+      CODE: "CHN"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  # identity-access-china-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "8046:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Identity Access Manager"
+  #     COUNTRY: "China"
+  #     CODE: "CHN"
+  #     CONTAINER_NAME: "identity-access-china-1"
+  #     instance: "identity-access-china-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "China"
+  #     CODE: "CHN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  mfa-singapore-china-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8047:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Multi-Factor Authentication (MFA) System"
+      COUNTRY: "China"
+      CODE: "CHN"
+      CONTAINER_NAME: "mfa-singapore-china-1"
+      instance: "mfa-singapore-china-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "China"
+      CODE: "CHN"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  sso-gateway-china-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8048:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Client Single Sign-On (SSO) Gateway"
+      COUNTRY: "China"
+      CODE: "CHN"
+      CONTAINER_NAME: "sso-gateway-china-1"
+      instance: "sso-gateway-china-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "China"
+      CODE: "CHN"
+    logging: *default-logging
+    networks:
+      - my-network
+  
+  customer-info-china-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8049:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Customer Information Database"
+      COUNTRY: "China"
+      CODE: "CHN"
+      CONTAINER_NAME: "customer-info-china-1"
+      instance: "customer-info-china-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "China"
+      CODE: "CHN"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  trade-repository-china-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8050:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Trade Repository"
+      COUNTRY: "China"
+      CODE: "CHN"
+      CONTAINER_NAME: "trade-repository-china-1"
+      instance: "trade-repository-china-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "China"
+      CODE: "CHN"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  # risk-data-china-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "8051:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Risk Data Warehouse"
+  #     COUNTRY: "China"
+  #     CODE: "CHN"
+  #     CONTAINER_NAME: "risk-data-china-1"
+  #     instance: "risk-data-china-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "China"
+  #     CODE: "CHN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # workflow-manager-china-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "8052:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Document Workflow Manager"
+  #     COUNTRY: "China"
+  #     CODE: "CHN"
+  #     CONTAINER_NAME: "workflow-manager-china-1"
+  #     instance: "workflow-manager-china-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "China"
+  #     CODE: "CHN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  task-scheduler-china-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "8053:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Task Scheduling System"
+      COUNTRY: "China"
+      CODE: "CHN"
+      CONTAINER_NAME: "task-scheduler-china-1"
+      instance: "task-scheduler-china-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "China"
+      CODE: "CHN"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  payment-processing-united-states-1:
+    # build: ./fastapi_app/
+    image: cyberguard_fastapi:latest
+    ports:
+      - "9001:8000"
+    depends_on:
+      - loki  
+    environment:
+      APP_NAME: "Payment Processing System"
+      COUNTRY: "United States"
+      CODE: "USA"
+      CONTAINER_NAME: "payment-processing-united-states-1"
+      instance: "payment-processing-united-states-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "United States"
+      CODE: "USA"
+    logging: *default-logging
+    networks:
+      - my-network
+  
+  market-data-united-states-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "9002:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Market Data Aggregator"
+      COUNTRY: "United States"
+      CODE: "USA"
+      CONTAINER_NAME: "market-data-united-states-1"
+      instance: "market-data-united-states-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "United States"
+      CODE: "USA"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  # risk-calc-united-states-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9003:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Risk Calculation Engine"
+  #     COUNTRY: "United States"
+  #     CODE: "USA"
+  #     CONTAINER_NAME: "risk-calc-united-states-1"
+  #     instance: "risk-calc-united-states-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "United States"
+  #     CODE: "USA"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # portfolio-dashboard-united-states-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9004:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Portfolio Management Dashboard"
+  #     COUNTRY: "United States"
+  #     CODE: "USA"
+  #     CONTAINER_NAME: "portfolio-dashboard-united-states-1"
+  #     instance: "portfolio-dashboard-united-states-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "United States"
+  #     CODE: "USA"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # market-monitoring-united-states-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9005:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Market Monitoring Interface"
+  #     COUNTRY: "United States"
+  #     CODE: "USA"
+  #     CONTAINER_NAME: "market-monitoring-united-states-1"
+  #     instance: "market-monitoring-united-states-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "United States"
+  #     CODE: "USA"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  crm-portal-united-states-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "9006:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "CRM Portal"
+      COUNTRY: "United States"
+      CODE: "USA"
+      CONTAINER_NAME: "crm-portal-united-states-1"
+      instance: "crm-portal-united-states-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "United States"
+      CODE: "USA"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  # retail-banking-united-states-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9007:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Retail Banking Portal"
+  #     COUNTRY: "United States"
+  #     CODE: "USA"
+  #     CONTAINER_NAME: "retail-banking-united-states-1"
+  #     instance: "retail-banking-united-states-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "United States"
+  #     CODE: "USA"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  treasury-management-united-states-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "9008:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Treasury Management System"
+      COUNTRY: "United States"
+      CODE: "USA"
+      CONTAINER_NAME: "treasury-management-united-states-1"
+      instance: "treasury-management-united-states-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "United States"
+      CODE: "USA"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  trade-execution-united-states-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "9009:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Trade Execution Platform"
+      COUNTRY: "United States"
+      CODE: "USA"
+      CONTAINER_NAME: "trade-execution-united-states-1"
+      instance: "trade-execution-united-states-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "United States"
+      CODE: "USA"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  # identity-access-united-states-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9010:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Identity Access Manager"
+  #     COUNTRY: "United States"
+  #     CODE: "USA"
+  #     CONTAINER_NAME: "identity-access-united-states-1"
+  #     instance: "identity-access-united-states-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "United States"
+  #     CODE: "USA"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  mfa-singapore-united-states-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "9011:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Multi-Factor Authentication (MFA) System"
+      COUNTRY: "United States"
+      CODE: "USA"
+      CONTAINER_NAME: "mfa-singapore-united-states-1"
+      instance: "mfa-singapore-states-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "United States"
+      CODE: "USA"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  sso-gateway-united-states-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "9012:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Client Single Sign-On (SSO) Gateway"
+      COUNTRY: "United States"
+      CODE: "USA"
+      CONTAINER_NAME: "sso-gateway-united-states-1"
+      instance: "sso-gateway-united-states-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "United States"
+      CODE: "USA"
+    logging: *default-logging
+    networks:
+      - my-network
+  
+  customer-info-united-states-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "9013:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Customer Information Database"
+      COUNTRY: "United States"
+      CODE: "USA"
+      CONTAINER_NAME: "customer-info-united-states-1"
+      instance: "customer-info-united-states-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "United States"
+      CODE: "USA"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  trade-repository-united-states-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "9014:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Trade Repository"
+      COUNTRY: "United States"
+      CODE: "USA"
+      CONTAINER_NAME: "trade-repository-united-states-1"
+      instance: "trade-repository-united-states-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "United States"
+      CODE: "USA"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  # risk-data-united-states-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9015:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Risk Data Warehouse"
+  #     COUNTRY: "United States"
+  #     CODE: "USA"
+  #     CONTAINER_NAME: "risk-data-united-states-1"
+  #     instance: "risk-data-united-states-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "United States"
+  #     CODE: "USA"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # workflow-manager-united-states-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9016:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Document Workflow Manager"
+  #     COUNTRY: "United States"
+  #     CODE: "USA"
+  #     CONTAINER_NAME: "workflow-manager-united-states-1"
+  #     instance: "workflow-manager-united-states-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "United States"
+  #     CODE: "USA"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  task-scheduler-united-states-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "9017:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "Task Scheduling System"
+      COUNTRY: "United States"
+      CODE: "USA"
+      CONTAINER_NAME: "task-scheduler-united-states-1"
+      instance: "task-scheduler-united-states-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "United States"
+      CODE: "USA"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  # compliance-monitor-united-states-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9018:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Compliance Monitoring Tool"
+  #     COUNTRY: "United States"
+  #     CODE: "USA"
+  #     CONTAINER_NAME: "compliance-monitor-united-states-1"
+  #     instance: "compliance-monitor-united-states-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "United States"
+  #     CODE: "USA"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # compliance-monitor-china-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "8054:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Compliance Monitoring Tool"
+  #     COUNTRY: "China"
+  #     CODE: "CHN"
+  #     CONTAINER_NAME: "compliance-monitor-china-1"
+  #     instance: "compliance-monitor-china-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "China"
+  #     CODE: "CHN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network      
+
+  # payment-processing-ch-1:
+  #   # build: ./fastapi_app/
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9019:8000"
+  #   depends_on:
+  #     - loki  
+  #   environment:
+  #     APP_NAME: "Payment Processing System"
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #     CONTAINER_NAME: "payment-processing-germany-1"
+  #     instance: "payment-processing-germany-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+  
+  # market-data-germany-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9020:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Market Data Aggregator"
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #     CONTAINER_NAME: "market-data-germany-1"
+  #     instance: "market-data-germany-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # risk-calc-germany-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9021:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Risk Calculation Engine"
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #     CONTAINER_NAME: "risk-calc-germany-1"
+  #     instance: "risk-calc-germany-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # portfolio-dashboard-germany-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9022:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Portfolio Management Dashboard"
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #     CONTAINER_NAME: "portfolio-dashboard-germany-1"
+  #     instance: "portfolio-dashboard-germany-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # market-monitoring-germany-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9023:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Market Monitoring Interface"
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #     CONTAINER_NAME: "market-monitoring-germany-1"
+  #     instance: "market-monitoring-germany-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  crm-portal-germany-1:
+    image: cyberguard_fastapi:latest
+    ports:
+      - "9024:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "CRM Portal"
+      COUNTRY: "Germany"
+      CODE: "GER"
+      CONTAINER_NAME: "crm-portal-germany-1"
+      instance: "crm-portal-germany-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "Germany"
+      CODE: "GER"
+    logging: *default-logging
+    networks:
+      - my-network
+
+  # retail-banking-germany-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9025:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Retail Banking Portal"
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #     CONTAINER_NAME: "retail-banking-germany-1"
+  #     instance: "retail-banking-germany-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # treasury-management-germany-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9026:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Treasury Management System"
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #     CONTAINER_NAME: "treasury-management-germany-1"
+  #     instance: "treasury-management-germany-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # trade-execution-germany-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9027:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Trade Execution Platform"
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #     CONTAINER_NAME: "trade-execution-germany-1"
+  #     instance: "trade-execution-germany-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # identity-access-germany-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9028:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Identity Access Manager"
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #     CONTAINER_NAME: "identity-access-germany-1"
+  #     instance: "identity-access-germany-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # mfa-singapore-germany-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9029:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Multi-Factor Authentication (MFA) System"
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #     CONTAINER_NAME: "mfa-singapore-germany-1"
+  #     instance: "mfa-singapore-germany-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # sso-gateway-germany-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9030:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Client Single Sign-On (SSO) Gateway"
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #     CONTAINER_NAME: "sso-gateway-germany-1"
+  #     instance: "sso-gateway-germany-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+  
+  # customer-info-germany-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9031:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Customer Information Database"
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #     CONTAINER_NAME: "customer-info-germany-1"
+  #     instance: "customer-info-germany-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # trade-repository-germany-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9032:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Trade Repository"
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #     CONTAINER_NAME: "trade-repository-germany-1"
+  #     instance: "trade-repository-germany-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # risk-data-germany-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9033:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Risk Data Warehouse"
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #     CONTAINER_NAME: "risk-data-germany-1"
+  #     instance: "risk-data-germany-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # workflow-manager-germany-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9034:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Document Workflow Manager"
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #     CONTAINER_NAME: "workflow-manager-germany-1"
+  #     instance: "workflow-manager-germany-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # task-scheduler-germany-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9035:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Task Scheduling System"
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #     CONTAINER_NAME: "task-scheduler-germany-1"
+  #     instance: "task-scheduler-germany-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # compliance-monitor-germany-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9036:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Compliance Monitoring Tool"
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #     CONTAINER_NAME: "compliance-monitor-germany-1"
+  #     instance: "compliance-monitor-germany-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Germany"
+  #     CODE: "GER"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network      
+
+  payment-processing-canada-1:
+    # build: ./fastapi_app/
+    image: cyberguard_fastapi:latest
+    ports:
+      - "9037:8000"
+    depends_on:
+      - loki  
+    environment:
+      APP_NAME: "Payment Processing System"
+      COUNTRY: "Canada"
+      CODE: "CAN"
+      CONTAINER_NAME: "payment-processing-canada-1"
+      instance: "payment-processing-canada-1:8000"
+      MYSQL_ROOT_PASSWORD: password
+    labels:
+      COUNTRY: "Canada"
+      CODE: "CAN"
+    logging: *default-logging
+    networks:
+      - my-network
+  
+  # market-data-canada-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9038:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Market Data Aggregator"
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #     CONTAINER_NAME: "market-data-canada-1"
+  #     instance: "market-data-canada-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # risk-calc-canada-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9039:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Risk Calculation Engine"
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #     CONTAINER_NAME: "risk-calc-canada-1"
+  #     instance: "risk-calc-canada-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # portfolio-dashboard-canada-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9040:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Portfolio Management Dashboard"
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #     CONTAINER_NAME: "portfolio-dashboard-canada-1"
+  #     instance: "portfolio-dashboard-canada-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # market-monitoring-canada-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9041:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Market Monitoring Interface"
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #     CONTAINER_NAME: "market-monitoring-canada-1"
+  #     instance: "market-monitoring-canada-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # crm-portal-canada-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9042:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "CRM Portal"
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #     CONTAINER_NAME: "crm-portal-canada-1"
+  #     instance: "crm-portal-canada-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # retail-banking-canada-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9043:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Retail Banking Portal"
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #     CONTAINER_NAME: "retail-banking-canada-1"
+  #     instance: "retail-banking-canada-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # treasury-management-canada-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9044:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Treasury Management System"
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #     CONTAINER_NAME: "treasury-management-canada-1"
+  #     instance: "treasury-management-canada-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # trade-execution-canada-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9045:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Trade Execution Platform"
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #     CONTAINER_NAME: "trade-execution-canada-1"
+  #     instance: "trade-execution-canada-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # identity-access-canada-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9046:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Identity Access ManaCAN"
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #     CONTAINER_NAME: "identity-access-canada-1"
+  #     instance: "identity-access-canada-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # mfa-singapore-canada-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9047:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Multi-Factor Authentication (MFA) System"
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #     CONTAINER_NAME: "mfa-singapore-canada-1"
+  #     instance: "mfa-singapore-canada-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # sso-gateway-canada-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9048:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Client Single Sign-On (SSO) Gateway"
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #     CONTAINER_NAME: "sso-gateway-canada-1"
+  #     instance: "sso-gateway-canada-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+  
+  # customer-info-canada-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9049:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Customer Information Database"
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #     CONTAINER_NAME: "customer-info-canada-1"
+  #     instance: "customer-info-canada-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # trade-repository-canada-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9050:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Trade Repository"
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #     CONTAINER_NAME: "trade-repository-canada-1"
+  #     instance: "trade-repository-canada-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # risk-data-canada-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9051:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Risk Data Warehouse"
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #     CONTAINER_NAME: "risk-data-canada-1"
+  #     instance: "risk-data-canada-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # workflow-manaCAN-canada-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9052:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Document Workflow ManaCAN"
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #     CONTAINER_NAME: "workflow-manaCAN-canada-1"
+  #     instance: "workflow-manaCAN-canada-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # task-scheduler-canada-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9053:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Task Scheduling System"
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #     CONTAINER_NAME: "task-scheduler-canada-1"
+  #     instance: "task-scheduler-canada-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # compliance-monitor-canada-1:
+  #   image: cyberguard_fastapi:latest
+  #   ports:
+  #     - "9054:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "Compliance Monitoring Tool"
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #     CONTAINER_NAME: "compliance-monitor-canada-1"
+  #     instance: "compliance-monitor-canada-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   labels:
+  #     COUNTRY: "Canada"
+  #     CODE: "CAN"
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+  
+  # database-app-sg-1:
+  #   image: database_fastapi:latest
+  #   ports:
+  #     - "8055:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "database-app-sg"
+  #     DB_HOST: "mysql-sg"
+  #     COUNTRY: "Singapore"
+  #     CODE: "SGP"
+  #     CONTAINER_NAME: "database-app-sg-1"
+  #     instance: "database-app-sg-1:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # database-app-sg-2:
+  #   image: database_fastapi:latest
+  #   ports:
+  #     - "8056:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "database-app-sg"
+  #     DB_HOST: "mysql-sg"
+  #     COUNTRY: "Singapore"
+  #     CODE: "SGP"
+  #     CONTAINER_NAME: "database-app-sg-2"
+  #     instance: "database-app-sg-2:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  # database-app-unitedstates:
+  #   image: database_fastapi:latest
+  #   ports:
+  #     - "8057:8000"
+  #   depends_on:
+  #     - loki
+  #   environment:
+  #     APP_NAME: "database-app-unitedstates"
+  #     DB_HOST: "mysql-unitedstates"
+  #     COUNTRY: "United States"
+  #     CODE: "USA"
+  #     CONTAINER_NAME: "database-app-unitedstates"
+  #     instance: "database-app-unitedstates:8000"
+  #     MYSQL_ROOT_PASSWORD: password
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+
+  login-app:
+    image: login_fastapi:latest
+    ports:
+      - "8058:8000"
+    depends_on:
+      - loki
+    environment:
+      APP_NAME: "login-app"
+      COUNTRY: "United States"
+      CODE: "USA"
+      CONTAINER_NAME: "login-app"
+      instance: "login-app:8000"
+      MYSQL_ROOT_PASSWORD: password
+    logging: *default-logging
+    networks:
+      - my-network
+
+  prometheus:
+    image: prom/prometheus:v2.51.2
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./etc/prometheus:/workspace
+    command:
+      - --config.file=/workspace/prometheus.yml
+      - --enable-feature=exemplar-storage
+    depends_on:
+      - loki
+    logging: *default-logging
+    networks:
+      - my-network
+
+  tempo:
+    image: grafana/tempo:2.4.1
+    command: [ "--target=all", "--storage.trace.backend=local", "--storage.trace.local.path=/var/tempo", "--auth.enabled=false" ]
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    depends_on:
+      - loki
+    logging: *default-logging
+    networks:
+      - my-network
+
+  grafana:
+    image: grafana/grafana:10.4.2
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./etc/grafana/:/etc/grafana/provisioning/datasources                        # Data Sources: Touch this file if you want to add more data sources
+      - ./etc/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml  # Dashboard Settings: Touch this file to add more stuff to dashboard (heatmaps, custom)
+      - ./etc/dashboards/fastapi:/etc/grafana/dashboards/fastapi                                  # Dashboard json files
+      - ./etc/dashboards/mysql:/etc/grafana/dashboards/mysql  
+    depends_on:
+      - loki
+      - prometheus
+    networks:
+      - my-network
+    logging: *default-logging
+
+  flask-app:
+      # build:
+      #   context: ./flask-app
+      #   dockerfile: Dockerfile
+      image: flask_app:latest
+      ports:
+        - "5123:5123"
+      environment:
+        - GRAFANA_URL=http://grafana:3000
+      depends_on:
+        - grafana
+      networks:
+      - my-network
+
+  # mysql-sg:
+  #   image: mysql_image:latest
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: password
+  #     MYSQL_DATABASE: db
+  #     COUNTRY: "Singapore"
+  #     CODE: "SGP"
+  #     CONTAINER_NAME: "mysql-sg"
+  #     instance: "mysql-sg:3306"
+  #     MYSQL_CONTAINER_NAME: mysql-sg
+  #     MYSQL_USER: exporter
+  #     MYSQL_PASSWORD: exporter_password
+  #   ports:
+  #     - "3307:3306"
+  #   volumes:
+  #     - mysql-sg-data:/var/lib/mysql-sg
+  #     - ./mysql-sg-logs:/var/log/mysql-sg  # Mount host directory for logs
+  #     - ./database/my-sg.cnf:/etc/mysql/my.cnf
+  #     - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+  #   depends_on:
+  #     - loki
+  #   networks:
+  #     - my-network
+  #   logging: *default-logging
+
+  # mysql-unitedstates:
+  #   image: mysql_image:latest
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: password
+  #     MYSQL_DATABASE: db
+  #     MYSQL_CONTAINER_NAME: mysql-unitedstates
+  #     CONTAINER_NAME: "mysql-unitedstates"
+  #     instance: "mysql-unitedstates:8000"
+  #     COUNTRY: "United States"
+  #     CODE: "USA"
+  #     MYSQL_USER: exporter
+  #     MYSQL_PASSWORD: exporter_password
+  #   ports:
+  #     - "3308:3306"
+  #   volumes:
+  #     - mysql-unitedstates-data:/var/lib/mysql-unitedstates
+  #     - ./mysql-unitedstates-logs:/var/log/mysql-unitedstates  # Mount host directory for logs
+  #     - ./database/my-unitedstates.cnf:/etc/mysql/my.cnf
+  #     - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+  #   depends_on:
+  #     - loki
+  #   logging: *default-logging
+  #   networks:
+  #     - my-network
+  
+  # promtail:
+  #   image: grafana/promtail:2.4.1
+  #   volumes:
+  #     - ./etc/promtail.yaml:/etc/promtail/promtail.yaml
+  #     - ./mysql-sg-logs:/var/log/mysql-sg  # Mount log directory
+  #     - ./mysql-denmark-logs:/var/log/mysql-denmark  # Mount log directory
+  #   command: -config.file=/etc/promtail/promtail.yaml
+  #   networks:
+  #     - my-network
+
+  # mysqld_exporter_sg:
+  #   image: prom/mysqld-exporter:latest
+  #   environment:
+  #     DATA_SOURCE_NAME: "exporter:exporter_password@(mysql-sg:3306)/"
+  #   command:
+  #     - "--mysqld.username=exporter:exporter_password"
+  #     - "--mysqld.address=mysql-sg:3306"
+  #   ports:
+  #     - "9104:9104"
+  #   depends_on:
+  #     - mysql-sg
+  #   networks:
+  #     - my-network
+
+  node-exporter:
+    image: prom/node-exporter
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /var/run:/var/run:rw
+
+  # mysqld_exporter_unitedstates:
+  #   image: prom/mysqld-exporter:latest
+  #   environment:
+  #     DATA_SOURCE_NAME: "exporter:exporter_password@(mysql-unitedstates:3306)/"
+  #   command:
+  #     - "--mysqld.username=exporter:exporter_password"
+  #     - "--mysqld.address=mysql-unitedstates:3306"
+  #   ports:
+  #     - "9105:9104"
+  #   depends_on:
+  #     - mysql-unitedstates
+  #   networks:
+  #     - my-network
+
+networks:
+  my-network:
+    driver: bridge
+
+volumes:
+  mysql-sg-data:
+  mysql-unitedstates-data:
